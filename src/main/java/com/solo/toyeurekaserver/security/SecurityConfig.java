@@ -1,5 +1,6 @@
 package com.solo.toyeurekaserver.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,6 +14,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Value("${server.username}")
+    private String username;
+
+    @Value("${server.password}")
+    private String password;
+
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
 
@@ -23,8 +30,8 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
 
         UserDetails user = User.builder()
-                .username("admin")
-                .password(bCryptPasswordEncoder().encode("admin1234"))
+                .username(username)
+                .password(bCryptPasswordEncoder().encode(password))
                 .roles("ADMIN")
                 .build();
 
