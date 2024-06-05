@@ -21,13 +21,13 @@ public class SecurityConfig {
     private String password;
 
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+    public BCryptPasswordEncoder bCryptPasswordEncoder() { // InMemoryUser의 password를 암호화 하기 위한 메서드
 
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
+    public UserDetailsService userDetailsService() { // ConfigServer 관리자, 서버실행시 한 계정만 생성 후 인메모리저장
 
         UserDetails user = User.builder()
                 .username(username)
@@ -35,20 +35,18 @@ public class SecurityConfig {
                 .roles("ADMIN")
                 .build();
 
+        System.out.println("Spring Config Server ADMIN username : " + username + " password : " + password);
+
         return new InMemoryUserDetailsManager(user);
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-                .csrf((auth) -> auth.disable());
-
-        http
-                .authorizeHttpRequests((auth) -> auth.anyRequest().authenticated());
-
-        http
-                .httpBasic(Customizer.withDefaults());
+        //config server를 호출하는 url에 username과 password를 담아 인증 후 데이터를 가져옴
+        http.csrf((auth) -> auth.disable());
+        http.httpBasic(Customizer.withDefaults());
+        http.authorizeHttpRequests((auth) -> auth.anyRequest().authenticated());
 
         return http.build();
     }
